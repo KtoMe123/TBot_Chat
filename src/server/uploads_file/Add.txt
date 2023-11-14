@@ -1,2 +1,0 @@
-передавать в ссылку роутера id бота
-https://stackoverflow.com/questions/17527713/force-browser-to-download-image-files-on-click
