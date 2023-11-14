@@ -10,19 +10,24 @@ class userController {
     const mess = await db.query('SELECT * FROM users where id_chat = $1', [id_chat])
     res.json(mess.rows)
   }
+  async getBotUser(req, res) {
+    const token = req.params.token
+    const mess = await db.query('SELECT * FROM users where token = $1', [token])
+    res.json(mess.rows)
+  }
   // async ViewMessage(req, res) {
   //   const {seen, u_to, u_from} = req.body
   //   const mess = await db.query('UPDATE mess SET seen = $1 where u_to = $2 AND u_from = $3 RETURNING *', [seen, u_to, u_from])
   //   res.json(mess.rows)
   // }
   async UpdateCount(req, res) {
-    const {count, id_chat} = req.body
-    const MyCount = await db.query('UPDATE users SET count = $1 where id_chat = $2 RETURNING *', [count, id_chat])
+    const {count, id_chat, token} = req.body
+    const MyCount = await db.query('UPDATE users SET count = $1 where id_chat = $2 AND token = $3 RETURNING *', [count, id_chat, token])
     res.json(MyCount.rows)
   }
   async CreateUser(req, res) {
-    const {id_chat, username, link, count}= req.body
-    const NewMes = await db.query('INSERT INTO users (id_chat, username, link, count) values ($1, $2, $3, $4) RETURNING *', [id_chat, username, link, count])
+    const {id_chat, username, link, count, token}= req.body
+    const NewMes = await db.query('INSERT INTO users (id_chat, username, link, count, token) values ($1, $2, $3, $4, $5) RETURNING *', [id_chat, username, link, count, token])
     res.json(NewMes)
   }
   async DeleteUser(req, res) {

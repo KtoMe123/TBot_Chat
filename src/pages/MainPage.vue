@@ -5,18 +5,58 @@ import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { io } from 'socket.io-client'
 
+const props = defineProps({
+  id: {
+    type: String,
+  },
+})
+
 const socket = io('http://localhost:3000')
+
 
 const Message = ref([])
 onMounted(() => {
-  fetch('http://localhost:8080/api/mess')
+  fetch('http://localhost:8080/api/bot-mess/' + props.id)
     .then((response) => response.json())
     .then((data) => Message.value = data.filter((v,i,a)=>a.sort((c, b) => c.id - b.id)))
 })
 
+const ImgVal = ref('')
+
 socket.on('receive-message', message => {
-    Message.value.push(message)
+  if(message.main.img) {
+    setTimeout(() => {
+      Message.value.push(message)
+    },2000)
+  } else if(message.main.video) {
+    setTimeout(() => {
+      Message.value.push(message)
+    },2000)
+  } else {
+    setTimeout(() => {
+      Message.value.push(message)
+    },2000)
+  }
+  
+    
 })
+const fbase64 = ref('')
+const fr = ref('')
+
+socket.on('receive-img', img => {
+    console.log(img)
+    alert('sdsd')
+    setTimeout(() => {
+      fetch(`https://api.telegram.org/bot${props.id}/getFile?file_id=${img.main.img}`)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data)       
+        
+        })
+    }, 150)
+
+})
+
 socket.on('receive-my-mess', mess => {
     Message.value.push(mess)
 })
@@ -34,15 +74,15 @@ const GetUsers = (Users) => {
 <template>
   <div class="container">
     <div class="header">
-      <h1 class="header-text">TeleBot {{UserId}}</h1>
+      <h1 class="header-text">TeleBot</h1>
     </div>
 
     <div class="main">
       <div class="main__list">
-        <List @SendId="GetId" @SendUser="GetUsers" :Message="Message"/></div>
+        <List @SendId="GetId" @SendUser="GetUsers" :token="props.id" :Message="Message"/></div>
       <div class="main__chat">
 
-        <Chat :UserId="UserId" :MyUsers="MyUsers" :Message="Message"/>
+        <Chat :UserId="UserId" :MyUsers="MyUsers" :token="props.id" :Message="Message"/>
       </div>
     </div>
     
@@ -87,7 +127,7 @@ const GetUsers = (Users) => {
     position: relative;
     flex: 75%;
     height: 100%;
-    background: rgba(146, 167, 186, 0.68);;
+    background: rgba(146, 167, 186, 0.68);
   }
 }
 

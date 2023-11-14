@@ -10,6 +10,11 @@ class mesController {
     const mess = await db.query('SELECT * FROM mess where id_chat = $1', [id_chat])
     res.json(mess.rows)
   }
+  async getBotMes(req, res) {
+    const token = req.params.token
+    const mess = await db.query('SELECT * FROM mess where token = $1', [token])
+    res.json(mess.rows)
+  }
   async ViewMess(req, res) {
     const {seen, id_chat} = req.body
     const mess = await db.query('UPDATE mess SET seen = $1 where id_chat = $2 RETURNING *', [seen, id_chat])
@@ -17,8 +22,8 @@ class mesController {
   }
 
   async CreateMes(req, res) {
-    const {id_chat, main, seen}= req.body
-    const NewMes = await db.query('INSERT INTO mess (id_chat, main, seen) values ($1, $2, $3) RETURNING *', [id_chat, main, seen])
+    const {id_chat, main, seen, token}= req.body
+    const NewMes = await db.query('INSERT INTO mess (id_chat, main, seen, token) values ($1, $2, $3, $4) RETURNING *', [id_chat, main, seen, token])
     res.json(NewMes)
   }
   async DeleteMess(req, res) {

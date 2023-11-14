@@ -3,7 +3,10 @@ import MainPage from './pages/MainPage.vue'
 </script>
 
 <template>
-<div class="main-app"><MainPage /></div>
+<div class="main-app"> 
+  <router-view></router-view>
+</div>
+
   
 </template>
 
@@ -15,8 +18,8 @@ import MainPage from './pages/MainPage.vue'
 }
 
 body {
-
     min-height: 100%;
+    min-width: 100%;
     background: #fff 100%;
     display: flex;
 }

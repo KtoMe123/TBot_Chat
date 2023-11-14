@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, nextTick, onMounted, ref } from "vue";
 import { io } from 'socket.io-client'
 import axios from 'axios'
 
@@ -9,6 +9,17 @@ const UserMess = ref('')
 const MessView = ref([])
 const CountView = ref({})
 const CountsView = ref([])
+
+
+const props = defineProps({
+  Message: {
+    type: Array
+  },
+  token: {
+    type: String,
+    required: true
+  }
+})
 
 const GetUserMess = () => {
   fetch('http://localhost:8080/api/mess/' + TrueId.value)
@@ -70,7 +81,7 @@ socket.on('receive-mess-view', (user_id, count) => {
 })
 
 onMounted(() => {
-  fetch('http://localhost:8080/api/users')
+  fetch('http://localhost:8080/api/bot-users/' + props.token)
     .then((response) => response.json())
     .then((data) => {
       Users.value = data
@@ -79,11 +90,7 @@ onMounted(() => {
   
 })
 
-const props = defineProps({
-  Message: {
-    type: Array
-  }
-})
+
 
 const Users = ref([])
 const Search = ref('')
@@ -104,7 +111,8 @@ const SendId = () => {
       .put('http://localhost:8080/api/mess/' + TrueId.value,
       {
         seen: true,
-        id_chat: TrueId.value
+        id_chat: TrueId.value,
+        token: props.token
       }
       )
       .then(response => {
@@ -118,7 +126,8 @@ const SendId = () => {
       .put('http://localhost:8080/api/users/' + TrueId.value,
       {
         count: 0,
-        id_chat: TrueId.value
+        id_chat: TrueId.value,
+        token: props.token
       }
       )
       .then(response => {
@@ -171,10 +180,11 @@ onMounted(() => {
   SortedUsers.value.sort((a,b) => MyMess.value.indexOf(b.id_chat) - MyMess.value.indexOf(a.id_chat))
   }, 500)
 
-
-
-
 })
+
+function UserId(id) {
+  TrueId.value = id;
+}
 </script>
 
 <template>
@@ -186,12 +196,11 @@ onMounted(() => {
   <div class="users" @click="SendId">
     <div class="users-empty" v-if="SortedUsers.length < 1">empty</div>
     <div class="users__list">
-      <div class="users__item" v-for="user in SortedUsers" :key="user.id" @click="TrueId = user.id_chat">
+      <div class="users__item" v-for="user in SortedUsers" :key="user.id" @click="UserId(user.id_chat)">
         <div  class="users__img"><img src="src/assets/user(1).png" alt="user" class="user-img"></div>
         <div class="users__info">
           <div class="users__name">{{user.username}}</div>
       </div>
-      <!-- {{typeof(user.id_chat)}} -->
         <span class="users-read">
           <div class="users-read__bd" v-if="MyMess.includes(user.id_chat)">{{user.count}}</div>
           <div v-else>
