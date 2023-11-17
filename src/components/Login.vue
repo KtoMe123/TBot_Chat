@@ -8,6 +8,7 @@ const PassField = ref('')
 const SearchBot = ref('http://localhost:8080/api/bot/')
 const BotInfo = ref('')
 
+
 function InfoBot(link) {
   setTimeout(() => {
     fetch(link)
@@ -67,7 +68,7 @@ function OpenReg () {
       <div class="login__button">
         <button type="submit" class="login-button">
           <div class="login__link" v-if="Login === false">Вход</div>
-          <router-link  class="login__link" v-if="Login === true" :to="{name: 'Main', params: {id: BotInfo[0].token}}">Вход</router-link>
+          <router-link  class="login__link" v-if="Login === true" :to="{name: 'Main', params: {mail: BotInfo[0].mail, id: BotInfo[0].token}}">Вход</router-link>
           </button>
       </div>
         <a @click="OpenReg" class="login__reg-link">Регистрация</a>

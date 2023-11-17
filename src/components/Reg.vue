@@ -34,7 +34,11 @@ function Reg() {
       {
         mail: EmailField.value.trim() ,
         pass: PassField.value.trim() , 
-        token: TokenField.value.trim() 
+        token: TokenField.value.trim(),
+        server: null,
+        socket_chat: null,
+        socket_list: null,
+        socket_main: null,
       }
       )
       .then(response => {

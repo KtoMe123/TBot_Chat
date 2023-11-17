@@ -9,33 +9,61 @@ const props = defineProps({
   id: {
     type: String,
   },
+  mail: {
+    type: String,
+  },
 })
 
 const socket = io('http://localhost:3000')
+
+
+  socket.on('connect', () => {
+    axios
+      .put('http://localhost:8080/api/bot_update_main/',
+      {
+        socket_main: socket.id,
+        token: props.id
+      }
+      )
+      .then(response => {
+      })
+      .catch(err => {
+          console.error('Ошибка при добавленнии значения:', err);
+      });
+})
+
+
+
+
 
 
 const Message = ref([])
 onMounted(() => {
   fetch('http://localhost:8080/api/bot-mess/' + props.id)
     .then((response) => response.json())
-    .then((data) => Message.value = data.filter((v,i,a)=>a.sort((c, b) => c.id - b.id)))
+    .then((data) => {
+      data.filter((v,i,a)=>a.sort((c, b) => b.id - c.id))
+      Message.value = data.filter((v,i,a)=>a.sort((c, b) => b.id - c.id))
+    })
 })
 
 const ImgVal = ref('')
 
 socket.on('receive-message', message => {
-  if(message.main.img) {
+  if(message.main.text) {
+    Message.value.unshift(message)
+  }else if(message.main.img) {
     setTimeout(() => {
-      Message.value.push(message)
+      Message.value.unshift(message)
     },2000)
   } else if(message.main.video) {
     setTimeout(() => {
-      Message.value.push(message)
+      Message.value.unshift(message)
     },2000)
   } else {
     setTimeout(() => {
-      Message.value.push(message)
-    },2000)
+      Message.value.unshift(message)
+    },5000)
   }
   
     
@@ -43,22 +71,8 @@ socket.on('receive-message', message => {
 const fbase64 = ref('')
 const fr = ref('')
 
-socket.on('receive-img', img => {
-    console.log(img)
-    alert('sdsd')
-    setTimeout(() => {
-      fetch(`https://api.telegram.org/bot${props.id}/getFile?file_id=${img.main.img}`)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data)       
-        
-        })
-    }, 150)
-
-})
-
 socket.on('receive-my-mess', mess => {
-    Message.value.push(mess)
+    Message.value.unshift(mess)
 })
 
 const UserId = ref('')

@@ -18,7 +18,7 @@ const props = defineProps({
   token: {
     type: String,
     required: true
-  }
+  },
 })
 
 const oReq = new XMLHttpRequest();
@@ -32,8 +32,7 @@ const Smiles = ['😀', '😁', '😂', '😃', '😄', '😅', '😆', '😇', 
                 '😶', '😷', '😸', '😹', '😺', '😻', '😼', '😽', '😾', '😿',
                 '🙀', '💩', '☠', '👌', '👍', '👎', '🙈', '🙉', '🙊']
 
-const socket = io('http://localhost:3000')
-
+const socket = io.connect('http://localhost:3000', {reconnect:true})
 
 const UpdUrl = `https://api.telegram.org/bot${props.token}/getupdates`
 const Mess = ref('')
@@ -111,7 +110,7 @@ const SendMEss = () => {
       .then(response => {
         
         if (response.ok) {
-          socket.emit('send-my-mess', my_file.value)
+          socket.emit('send-my-mess', props.token, my_file.value)
           console.log('Изображение успешно отправлено');
           LoadCount.value -= 1
         } else {
@@ -207,7 +206,7 @@ const SendMEss = () => {
           });
 
           setTimeout(() => {
-            socket.emit('send-my-mess', my_file.value)
+            socket.emit('send-my-mess', props.token, my_file.value)
           },200)
 
         LoadCount.value -= 1
@@ -241,7 +240,7 @@ const SendMEss = () => {
       .then(response => {
         
         if (response.ok) {
-          socket.emit('send-my-mess', my_file.value)
+          socket.emit('send-my-mess', props.token, my_file.value)
           console.log('file успешно отправлено');
           LoadCount.value -= 1
         } else {
@@ -317,7 +316,7 @@ const SendMEss = () => {
       .catch(err => {
           console.error('Ошибка при добавленнии значения:', err);
       });
-  socket.emit('send-my-mess', EmitMess.value)
+  socket.emit('send-my-mess', props.token, EmitMess.value)
   oReq.open("POST", url(props.UserId, Mess.value), true);
   oReq.send();
   Mess.value = ''
@@ -695,10 +694,9 @@ function stop(link) {
   &__voice {
     background-color: #fff;
     text-align: right;
-    transform: scaleY(-1);
-    margin: 0 20px;
+    // transform: scaleY(-1);
     display: flex;
-    transform: scaleY(-1);
+    // transform: scaleY(-1);
     padding: 10px;
     border-radius: 15px;
     align-items: center;
@@ -749,7 +747,8 @@ function stop(link) {
       max-width: 200px;
       white-space: nowrap;
       overflow: hidden; 
-      text-overflow: ellipsis
+      text-overflow: ellipsis;
+      padding: 3px;
     }
     &-icon {
       margin-right: 5px;
@@ -801,6 +800,7 @@ function stop(link) {
     width: 100%;
     position: absolute;
     bottom: 55px;
+    left: 0;
     
     &__load {
       display: flex;
@@ -993,16 +993,46 @@ function stop(link) {
   &__content {
     overflow-y: auto;
     flex: 1 1 auto;
-    max-height: 750px;
+    max-height: 80vh;
     height: 100%;
-    
-  }
-  &__messages {
-    transform: scaleY(-1);
+    transition: 0.2s all;
     display: flex;
     flex-direction: column-reverse;
-    margin: 0 auto;
-    max-width: 700px;
+    padding: 0 19vw;
+    @media screen and (max-width: 1858px) {
+      padding: 0 18vw;
+    } 
+    @media screen and (max-width: 1745px) {
+      padding: 0 16vw;
+    } 
+    @media screen and (max-width: 1645px) {
+      padding: 0 14vw;
+    } 
+    @media screen and (max-width: 1545px) {
+      padding: 0 12vw;
+    } 
+    @media screen and (max-width: 1445px) {
+      padding: 0 11vw;
+    } 
+    @media screen and (max-width: 1345px) {
+      padding: 0 10vw;
+    } 
+    @media screen and (max-width: 1245px) {
+      padding: 0 9vw;
+    } 
+    @media screen and (max-width: 1145px) {
+      padding: 0 8vw;
+    } 
+    @media screen and (max-width: 1045px) {
+      padding: 0 7vw;
+    } 
+  }
+  &__messages {
+    // transform: scaleY(-1);
+    display: flex;
+    flex-direction: column-reverse;
+    // margin: 0 auto;
+    // max-width: 700px;
     
     }
     &__message {
@@ -1015,8 +1045,6 @@ function stop(link) {
       & .chat__text {
         background-color: rgb(138, 169, 242);
         text-align: right;
-        transform: scaleY(-1);
-        margin: 0 20px;
         &::before {
           content: '';
           position: absolute;
@@ -1030,26 +1058,33 @@ function stop(link) {
       & .chat__img {
         background-color: rgb(138, 169, 242);
         text-align: right;
-        transform: scaleY(-1);
-        margin: 0 20px;
+        // transform: scaleY(-1);
+        & .chat__time {
+          right: 20px;
+          left: auto;
+        }
         }
       & .chat__video {
         background-color: rgb(138, 169, 242);
         text-align: right;
-        transform: scaleY(-1);
-        margin: 0 20px;
+        // transform: scaleY(-1);
+        & .chat__time {
+          right: 20px;
+          left: auto;
+        }
         }
       & .chat__file {
         background-color: rgb(138, 169, 242);
         text-align: right;
-        transform: scaleY(-1);
-        margin: 0 20px;
+        // transform: scaleY(-1);
+        & .chat__time {
+          right: 20px;
+          left: auto;
+        }
         }
     }
     
     &__message_frend .chat__text {
-      margin: 0 20px;
-      transform: scaleY(-1);  
       &::before {
         content: '';
         position: absolute;
@@ -1060,14 +1095,9 @@ function stop(link) {
         background: linear-gradient( -135deg,#fff 0%, #fff 50%, transparent 50%, transparent);
       }
     }
-    &__message_frend .chat__img {
-      margin: 0 20px;
-      transform: scaleY(-1);  
-    }
+
     &__message_frend .chat__file {
       background-color: #fff;
-      margin: 0 20px;
-      transform: scaleY(-1);  
     }
     &__text {
       text-align: left;
@@ -1105,7 +1135,7 @@ function stop(link) {
       background-color: #fff;
       border-radius: 10px;
       font-size: 14px;
-      transform: scaleY(-1);
+      // transform: scaleY(-1);
       max-width: 500px;
       & .chat__time {
         margin: 0;

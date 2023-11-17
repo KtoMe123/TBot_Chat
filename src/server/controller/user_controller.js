@@ -10,6 +10,12 @@ class userController {
     const mess = await db.query('SELECT * FROM users where id_chat = $1', [id_chat])
     res.json(mess.rows)
   }
+  async getUser(req, res) {
+    const id_chat = req.params.id_chat
+    const token = req.params.token
+    const mess = await db.query('SELECT * FROM users where id_chat = $1 AND token = $2', [id_chat, token])
+    res.json(mess.rows)
+  }
   async getBotUser(req, res) {
     const token = req.params.token
     const mess = await db.query('SELECT * FROM users where token = $1', [token])

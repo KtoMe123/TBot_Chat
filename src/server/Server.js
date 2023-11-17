@@ -106,21 +106,61 @@ const server = () => {
   })
 
   io.on('connection', socket => {
-    console.log(socket.id)
+    // console.log(socket.id)
     socket.on('send-message', (message) => {
-      io.emit('receive-message', message)
+      fetch('http://localhost:8080/api/bots/' + message.token)
+      .then((response) => response.json())
+      .then((data) => {
+        data.forEach(element => {
+          console.log(element.socket_main)
+          io.to(element.socket_main).emit('receive-message', message)
+        });
+        
+      })
+      
     })
     socket.on('send-img', (img) => {
-      io.emit('receive-img', img)
+      fetch('http://localhost:8080/api/bots/' + img.token)
+      .then((response) => response.json())
+      .then((data) => {
+        data.forEach(element => {
+          io.to(element.socket_main).emit('receive-img', img)
+        });
+        
+      })
     })
     socket.on('send-user', (user) => {
-      io.emit('receive-user', user)
+      fetch('http://localhost:8080/api/bots/' + user.token)
+      .then((response) => response.json())
+      .then((data) => {
+        data.forEach(element => {
+          io.to(element.socket_main).emit('receive-user', user)
+        });
+        
+      })
     })
-    socket.on('send-my-mess', (mess) => {
-      io.emit('receive-my-mess', mess)
+    socket.on('send-my-mess', (token, mess) => {
+      fetch('http://localhost:8080/api/bots/' + token)
+      .then((response) => response.json())
+      .then((data) => {
+        // console.log(data)
+        data.forEach(element => {
+          console.log(element)
+          io.to(element.socket_main).emit('receive-my-mess', mess)
+        });
+        
+      })
     })
-    socket.on('send-mess-view', (mess, count) => {
-      io.emit('receive-mess-view', mess, count)
+    socket.on('send-mess-view', (token, mess, count) => {
+      fetch('http://localhost:8080/api/bots/' + token)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data)
+        data.forEach(element => {
+          io.to(element.socket_list).emit('receive-mess-view', token, mess, count)
+        });
+        
+      })
     })
     
   })

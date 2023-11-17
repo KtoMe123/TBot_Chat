@@ -3,14 +3,30 @@ import { computed, nextTick, onMounted, ref } from "vue";
 import { io } from 'socket.io-client'
 import axios from 'axios'
 
-const socket = io('http://localhost:3000')
+const socket = io.connect('http://localhost:3000', {reconnect:true})
+
+
 const TrueId = ref('')
 const UserMess = ref('')
 const MessView = ref([])
 const CountView = ref({})
 const CountsView = ref([])
+const SocketList = ref('')
 
-
+socket.on('connect', () => {
+    axios
+      .put('http://localhost:8080/api/bot_update_list/',
+      {
+        socket_list: socket.id,
+        token: props.token
+      }
+      )
+      .then(response => {
+      })
+      .catch(err => {
+          console.error('Ошибка при добавленнии значения:', err);
+      });
+})
 const props = defineProps({
   Message: {
     type: Array
@@ -18,7 +34,8 @@ const props = defineProps({
   token: {
     type: String,
     required: true
-  }
+  },
+
 })
 
 const GetUserMess = () => {
@@ -31,11 +48,13 @@ const GetUserMess = () => {
 }
 
 
-socket.on('receive-mess-view', (user_id, count) => {
+socket.on('receive-mess-view', (token, user_id, count) => {
   MessView.value.push(user_id)
+  console.log(token)
   console.log(user_id)
   console.log(count)
   CountView.value = {
+    token: token,
     key: user_id,
     count: count + 1
   }
@@ -62,10 +81,11 @@ socket.on('receive-mess-view', (user_id, count) => {
       });
 
     axios
-      .put('http://localhost:8080/api/users/' + TrueId.value,
+      .put('http://localhost:8080/api/users_count',
       {
         count: 0,
-        id_chat: TrueId.value
+        id_chat: TrueId.value,
+        token: props.token
       }
       )
       .then(response => {
@@ -123,7 +143,7 @@ const SendId = () => {
       });
 
     axios
-      .put('http://localhost:8080/api/users/' + TrueId.value,
+      .put('http://localhost:8080/api/users_count',
       {
         count: 0,
         id_chat: TrueId.value,
