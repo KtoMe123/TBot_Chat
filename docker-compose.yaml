@@ -1,0 +1,40 @@
+version: "3.5"
+services:
+  vue_docker:
+    image: vue_docker
+    container_name: vue_docker
+    ports:
+      - "8080:8080"
+    tty: true
+    build: "./Bot/."
+    depends_on:
+      - pgdb
+      - server
+
+  pgdb:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: mess
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: w123
+    ports:
+      - "5433:5432"
+    volumes:
+      - "./database/.:/docker-entrypoint-initdb.d"
+    depends_on:
+      - server
+    restart: unless-stopped
+    tty: true
+
+  server:
+    image: my-node-app
+    container_name: server
+    ports:
+      - "8081:8081"
+      - "3000:3000"
+
+    build: "./server/."
+    tty: true
+
+volumes:
+  pgdb:
